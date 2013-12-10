@@ -190,7 +190,7 @@ class ProducerTest extends JUnit3Suite with ZooKeeperTestHarness with Logging{
       fail("Should have timed out for 3 acks.")
     }
     catch {
-      case se: FailedToSendMessageException => true
+      case se: FailedToSendMessageException =>
       case e: Throwable => fail("Not expected", e)
     }
     finally {
