@@ -52,7 +52,7 @@
 
             <dependency>
                 <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka_${scala.major.version}</artifactId>
+                <artifactId>kafka-core_${scala.major.version}</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
