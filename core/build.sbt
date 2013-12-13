@@ -8,8 +8,6 @@ resolvers ++= Seq(
   "SonaType ScalaTest repo" at "https://oss.sonatype.org/content/groups/public/org/scalatest/"
 )
 
-libraryDependencies <+= scalaVersion("org.scala-lang" % "scala-compiler" % _ )
-
 libraryDependencies ++= Seq(
   "org.apache.zookeeper"  % "zookeeper"   % "3.3.4",
   "com.101tec"            % "zkclient"     % "0.3",
