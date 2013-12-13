@@ -28,7 +28,7 @@ $base_dir/../../bin/kafka-server-start.sh $base_dir/config/server.properties 2>&
 
 sleep 4
 echo "start producing $num_messages messages ..."
-$base_dir/../../bin/kafka-run-class.sh kafka.perf.ProducerPerformance --brokerinfo broker.list=0:localhost:9092 --topics test01 --messages $num_messages --message-size $message_size --batch-size 200 --threads 1 --reporting-interval 100000 num_messages --async --compression-codec 1 
+$base_dir/../../bin/kafka-run-class.sh kafka.perf.ProducerPerformance --broker-list localhost:9092 --topics test01 --messages $num_messages --message-size $message_size --batch-size 200 --threads 1 --reporting-interval 100000 num_messages  --compression-codec 1 
 
 echo "wait for data to be persisted" 
 cur_offset="-1"
@@ -36,7 +36,7 @@ quit=0
 while [ $quit -eq 0 ]
 do
   sleep 2
-  target_size=`$base_dir/../../bin/kafka-run-class.sh kafka.tools.GetOffsetShell --server kafka://localhost:9092 --topic test01 --partition 0 --time -1 --offsets 1 | tail -1`
+  target_size=`$base_dir/../../bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list localhost:9092 --topic test01 --partition 0 --time -1 --offsets 1 | sed 's/.*://'`
   if [ $target_size -eq $cur_offset ]
   then
     quit=1
@@ -45,9 +45,8 @@ do
 done
 
 sleep 2
-actual_size=`$base_dir/../../bin/kafka-run-class.sh kafka.tools.GetOffsetShell --server kafka://localhost:9092 --topic test01 --partition 0 --time -1 --offsets 1 | tail -1`
-num_batches=`expr $num_messages \/ $message_size`
-expected_size=`expr $num_batches \* 262`
+actual_size=`$base_dir/../../bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list localhost:9092 --topic test01 --partition 0 --time -1 --offsets 1 | sed 's/.*://'`
+expected_size=$num_messages
 
 if [ $actual_size != $expected_size ]
 then
