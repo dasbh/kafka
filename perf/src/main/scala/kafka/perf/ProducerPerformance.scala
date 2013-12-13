@@ -49,15 +49,14 @@ object ProducerPerformance extends Logging {
     val startMs = System.currentTimeMillis
     val rand = new java.util.Random
 
-    if(!config.hideHeader)
-        println("start.time, end.time, compression, message.size, batch.size, total.data.sent.in.MB, MB.sec, " +
-                        "total.data.sent.in.nMsg, nMsg.sec")
-
     for(i <- 0 until config.numThreads) {
       executor.execute(new ProducerThread(i, config, totalBytesSent, totalMessagesSent, allDone, rand))
     }
 
     allDone.await()
+    if(!config.hideHeader)
+      println("start.time, end.time, compression, message.size, batch.size, total.data.sent.in.MB, MB.sec, " +
+        "total.data.sent.in.nMsg, nMsg.sec")
     val endMs = System.currentTimeMillis
     val elapsedSecs = (endMs - startMs) / 1000.0
     val totalMBSent = (totalBytesSent.get * 1.0)/ (1024 * 1024)
@@ -65,6 +64,19 @@ object ProducerPerformance extends Logging {
       config.dateFormat.format(startMs), config.dateFormat.format(endMs),
       config.compressionCodec.codec, config.messageSize, config.batchSize, totalMBSent,
       totalMBSent/elapsedSecs, totalMessagesSent.get, totalMessagesSent.get/elapsedSecs))
+
+    println("====================================================")
+    println("Start Time         : " + config.dateFormat.format(startMs))
+    println("End Time           : " + config.dateFormat.format(endMs))
+    println("Compression        : " + config.compressionCodec.codec)
+    println("Message Size(bytes): " + config.messageSize)
+    println("Batch Size         : " + config.batchSize)
+    println("Total Data in MB   : " + totalMBSent)
+    println("MB/sec             : " + (totalMBSent/elapsedSecs))
+    println("Messages Sent      : " + totalMessagesSent.get)
+    println("Messages/sec       : " + totalMessagesSent.get/elapsedSecs)
+    println("====================================================")
+
     System.exit(0)
   }
 
@@ -176,7 +188,6 @@ object ProducerPerformance extends Logging {
     val props = new Properties()
     props.put("metadata.broker.list", config.brokerList)
     props.put("compression.codec", config.compressionCodec.codec.toString)
-    props.put("reconnect.interval", Integer.MAX_VALUE.toString)
     props.put("send.buffer.bytes", (64*1024).toString)
     if(!config.isSync) {
       props.put("producer.type","async")
